@@ -49,37 +49,35 @@ var Board = function (_React$Component) {
         value: this.props.squares[i],
         onClick: function onClick() {
           return _this2.props.onClick(i);
-        }
+        },
+        key: "cell " + i
       });
     }
   }, {
     key: "render",
     value: function render() {
 
+      // Generate cells with loops
+      var rows_buttons = [];
+      for (var row = 0; row < 3; row++) {
+        var buttons = [];
+
+        for (var column = 0; column < 3; column++) {
+          buttons.push(this.renderSquare(row * 3 + column));
+        }
+
+        var row_buttons = React.createElement(
+          "div",
+          { className: "board-row", key: "row " + row },
+          buttons
+        );
+        rows_buttons.push(row_buttons);
+      }
+
       return React.createElement(
         "div",
         null,
-        React.createElement(
-          "div",
-          { className: "board-row" },
-          this.renderSquare(0),
-          this.renderSquare(1),
-          this.renderSquare(2)
-        ),
-        React.createElement(
-          "div",
-          { className: "board-row" },
-          this.renderSquare(3),
-          this.renderSquare(4),
-          this.renderSquare(5)
-        ),
-        React.createElement(
-          "div",
-          { className: "board-row" },
-          this.renderSquare(6),
-          this.renderSquare(7),
-          this.renderSquare(8)
-        )
+        rows_buttons
       );
     }
   }]);

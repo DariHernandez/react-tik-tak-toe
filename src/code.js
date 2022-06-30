@@ -33,29 +33,29 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
+        key={"cell " + i}
       />
     );
   }
 
   render() {
 
+    // Generate cells with loops
+    let rows_buttons = []
+    for (let row = 0; row < 3; row++) { 
+      let buttons = []
+
+      for (let column = 0; column < 3; column++) {
+        buttons.push (this.renderSquare(row*3+column))
+      }
+
+      let row_buttons = <div className="board-row" key={"row " + row}>{buttons}</div>
+      rows_buttons.push (row_buttons)
+    }
+
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {rows_buttons}
       </div>
     );
   }
