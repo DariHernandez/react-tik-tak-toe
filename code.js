@@ -179,7 +179,7 @@ var Game = function (_React$Component2) {
         }
         return React.createElement(
           "li",
-          { key: move },
+          { key: move, className: move == _this4.state.stepNumber ? "active" : "" },
           React.createElement(
             "button",
             { onClick: function onClick() {
