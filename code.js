@@ -142,7 +142,41 @@ var Game = function (_React$Component2) {
       var winner = calculateWinner(current.squares);
 
       var moves = history.map(function (step, move) {
-        var desc = move ? 'Go move to # ' + move : 'Go to start game';
+        var desc = void 0;
+        if (move) {
+
+          // Get the new symbol in the board
+          var last_step = history[move - 1];
+          var symbol = void 0;
+          var diference = step["squares"].map(function (cell, cell_id) {
+            if (last_step["squares"][cell_id] == cell) {
+              return null;
+            } else {
+              symbol = cell;
+              return cell;
+            }
+          });
+
+          // get position of the new symbol in board
+          var row = void 0;
+          var start_cell = void 0;
+          if (diference.indexOf(symbol) <= 3) {
+            row = 1;
+            start_cell = 0;
+          } else if (diference.indexOf(symbol) <= 6) {
+            row = 2;
+            start_cell = 3;
+          } else {
+            row = 3;
+            start_cell = 6;
+          }
+          var column = diference.indexOf(symbol) - start_cell + 1;
+
+          // generate button text with position and symbol
+          desc = "Go move to #" + move + ", \"" + symbol + "\" (" + row + "," + column + ")\"";
+        } else {
+          desc = 'Go to start game';
+        }
         return React.createElement(
           "li",
           { key: move },
@@ -155,6 +189,8 @@ var Game = function (_React$Component2) {
           )
         );
       });
+
+      console.log("------------");
 
       var status = void 0;
       if (winner) {

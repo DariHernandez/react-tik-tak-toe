@@ -105,13 +105,52 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares)
 
     const moves = history.map ((step, move) => {
-      const desc = move ? 'Go move to # ' + move : 'Go to start game'
+      let desc
+      if (move) {
+
+        // Get the new symbol in the board
+        const last_step = history[move-1]
+        let symbol
+        let diference = step["squares"].map ((cell, cell_id) => {
+          if (last_step["squares"][cell_id] == cell) {
+            return null
+          } else {
+            symbol = cell
+            return cell
+          } 
+        })
+        
+        // get position of the new symbol in board
+        let row
+        let start_cell
+        if (diference.indexOf (symbol) <= 3) {
+          row = 1
+          start_cell = 0
+        } else if (diference.indexOf (symbol) <= 6) {
+          row = 2
+          start_cell = 3
+        } else {
+          row = 3
+          start_cell = 6
+
+        }
+        const column = diference.indexOf (symbol) - start_cell + 1
+
+        // generate button text with position and symbol
+        desc = `Go move to #${move}, "${symbol}" (${row},${column})"` 
+        
+
+      } else {
+        desc = 'Go to start game'
+      }
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       )
     })
+
+    console.log ("------------")
 
     let status
     if (winner) {
