@@ -98,7 +98,8 @@ var Game = function (_React$Component2) {
         squares: Array(9).fill(null)
       }],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      historyInverse: false
     };
     return _this3;
   }
@@ -128,6 +129,14 @@ var Game = function (_React$Component2) {
       this.setState({
         stepNumber: step,
         xIsNext: step % 2 === 0
+      });
+    }
+  }, {
+    key: "historyInverse",
+    value: function historyInverse() {
+      var historyInverse = this.state.historyInverse;
+      this.setState({
+        historyInverse: !historyInverse
       });
     }
   }, {
@@ -185,13 +194,29 @@ var Game = function (_React$Component2) {
         );
       });
 
-      console.log("------------");
-
       var status = void 0;
       if (winner) {
         status = "Winner: " + winner;
       } else {
         status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+      }
+
+      // Reverse button order
+      var historyInverse = this.state.historyInverse;
+
+      if (historyInverse) {
+        moves.reverse();
+        moves_list = React.createElement(
+          "ol",
+          { reversed: true },
+          moves
+        );
+      } else {
+        moves_list = React.createElement(
+          "ol",
+          null,
+          moves
+        );
       }
 
       return React.createElement(
@@ -213,10 +238,13 @@ var Game = function (_React$Component2) {
             status
           ),
           React.createElement(
-            "ol",
-            null,
-            moves
-          )
+            "button",
+            { onClick: function onClick() {
+                return _this4.historyInverse();
+              } },
+            "Inverse order"
+          ),
+          moves_list
         )
       );
     }
