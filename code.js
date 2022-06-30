@@ -158,17 +158,14 @@ var Game = function (_React$Component2) {
           // get position of the new symbol in board
           var row = void 0;
           var start_cell = void 0;
-          if (diference.indexOf(symbol) <= 3) {
+          if (diference.indexOf(symbol) < 3) {
             row = 1;
-            start_cell = 0;
-          } else if (diference.indexOf(symbol) <= 6) {
+          } else if (diference.indexOf(symbol) < 6) {
             row = 2;
-            start_cell = 3;
           } else {
             row = 3;
-            start_cell = 6;
           }
-          var column = diference.indexOf(symbol) - start_cell + 1;
+          var column = diference.indexOf(symbol) - (row - 1) * 3 + 1;
 
           // generate button text with position and symbol
           desc = "Go move to #" + move + ", \"" + symbol + "\" (" + row + "," + column + ")\"";
