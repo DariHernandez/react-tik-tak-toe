@@ -7,6 +7,7 @@ body {
     padding-left: 30px;
   }
 
+  /* Make bold the active button */
   li.active button {
     font-weight: bold;
   }
@@ -35,7 +36,12 @@ body {
     text-align: center;
     width: 34px;
   }
-  
+
+  /* Highlight winner cells */
+  .square.winner {
+    background: lightgreen;
+  }
+
   .square:focus {
     outline: none;
   }

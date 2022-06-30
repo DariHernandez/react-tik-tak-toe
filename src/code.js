@@ -12,16 +12,18 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {winner: squares[a], winner_line: lines[i]}; // Return winner symbol and linw
     }
   }
-  return null;
+  return {winner: null, winner_line: null};
 }
 
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
+    <button 
+      className={"square " + (props.winner ? "winner" : "")} // Add "winner" class to cell winner lines
+      onClick={props.onClick}> 
+        {props.value}
     </button>
   );
 }
@@ -29,13 +31,28 @@ function Square(props) {
 class Board extends React.Component {
 
   renderSquare(i) {
-    return (
-      <Square
+
+    // Check if there is a winner
+    const winner_line = this.props.winner_line
+
+    let squere
+    if (winner_line.includes (i)) {
+      console.log ("valid cell")
+      squere = <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
         key={"cell " + i}
-      />
-    );
+        winner={true}
+        />
+    } else {
+      squere = <Square
+        value={this.props.squares[i]}
+        onClick={() => this.props.onClick(i)}
+        key={"cell " + i}
+        winner={false}
+        />
+    }
+    return (squere);
   }
 
   render() {
@@ -46,7 +63,8 @@ class Board extends React.Component {
       let buttons = []
 
       for (let column = 0; column < 3; column++) {
-        buttons.push (this.renderSquare(row*3+column))
+        const button_num = row*3+column
+        buttons.push (this.renderSquare(button_num))
       }
 
       let row_buttons = <div className="board-row" key={"row " + row}>{buttons}</div>
@@ -71,23 +89,40 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
-      historyInverse: false
+      historyInverse: false,
+      winner_line: []
     }
   }
 
   handleClick (i) {
 
-    const history = this.state.history.slice (0, this.state.stepNumber + 1)
-    const current = history[history.length - 1]
-    const squares = current.squares.slice()
-    if (calculateWinner(squares) || squares[i]) {
+    let history = this.state.history.slice (0, this.state.stepNumber + 1)
+    let current = history[history.length - 1]
+    let squares = current.squares.slice()
+
+    // Ignore click when cell is in use or already there is a winner
+    if (squares[i] || calculateWinner(squares)["winner"]) {
       return
     }
+    
+    // Update squeres history data
     squares[i] = this.state.xIsNext ? "X" : "O"
-    this.setState({
-      history: history.concat([{
+    history_new = history.concat([{
         squares: squares,
-      }]),
+    }])
+  
+    // validate winner and update winner_line variable status
+    const winner_data = calculateWinner(squares)
+    if (winner_data["winner"]) {
+      winner_line = winner_data["winner_line"]
+      this.setState({
+        winner_line: winner_line
+      })
+    }
+
+    // Update state
+    this.setState({
+      history: history_new,
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext
     })
@@ -110,7 +145,7 @@ class Game extends React.Component {
   render() {
     const history = this.state.history
     const current = history [this.state.stepNumber]
-    const winner = calculateWinner(current.squares)
+    const winner = calculateWinner(current.squares)["winner"]
 
     const moves = history.map ((step, move) => {
       let desc
@@ -174,7 +209,7 @@ class Game extends React.Component {
     return (
       <div className="game">
         <div className="game-board">
-          <Board squares={current.squares} onClick={(i) => this.handleClick(i)} />
+          <Board squares={current.squares} onClick={(i) => this.handleClick(i)} winner_line={this.state.winner_line} />
         </div>
         <div className="game-info">
           <div>{status}</div>

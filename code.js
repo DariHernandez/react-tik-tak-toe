@@ -17,16 +17,18 @@ function calculateWinner(squares) {
         c = _lines$i[2];
 
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return { winner: squares[a], winner_line: lines[i] }; // Return winner symbol and linw
     }
   }
-  return null;
+  return { winner: null, winner_line: null };
 }
 
 function Square(props) {
   return React.createElement(
     "button",
-    { className: "square", onClick: props.onClick },
+    {
+      className: "square " + (props.winner ? "winner" : "") // Add "winner" class to cell winner lines
+      , onClick: props.onClick },
     props.value
   );
 }
@@ -45,13 +47,31 @@ var Board = function (_React$Component) {
     value: function renderSquare(i) {
       var _this2 = this;
 
-      return React.createElement(Square, {
-        value: this.props.squares[i],
-        onClick: function onClick() {
-          return _this2.props.onClick(i);
-        },
-        key: "cell " + i
-      });
+      // Check if there is a winner
+      var winner_line = this.props.winner_line;
+
+      var squere = void 0;
+      if (winner_line.includes(i)) {
+        console.log("valid cell");
+        squere = React.createElement(Square, {
+          value: this.props.squares[i],
+          onClick: function onClick() {
+            return _this2.props.onClick(i);
+          },
+          key: "cell " + i,
+          winner: true
+        });
+      } else {
+        squere = React.createElement(Square, {
+          value: this.props.squares[i],
+          onClick: function onClick() {
+            return _this2.props.onClick(i);
+          },
+          key: "cell " + i,
+          winner: false
+        });
+      }
+      return squere;
     }
   }, {
     key: "render",
@@ -63,7 +83,8 @@ var Board = function (_React$Component) {
         var buttons = [];
 
         for (var column = 0; column < 3; column++) {
-          buttons.push(this.renderSquare(row * 3 + column));
+          var button_num = row * 3 + column;
+          buttons.push(this.renderSquare(button_num));
         }
 
         var row_buttons = React.createElement(
@@ -99,7 +120,8 @@ var Game = function (_React$Component2) {
       }],
       stepNumber: 0,
       xIsNext: true,
-      historyInverse: false
+      historyInverse: false,
+      winner_line: []
     };
     return _this3;
   }
@@ -111,14 +133,30 @@ var Game = function (_React$Component2) {
       var history = this.state.history.slice(0, this.state.stepNumber + 1);
       var current = history[history.length - 1];
       var squares = current.squares.slice();
-      if (calculateWinner(squares) || squares[i]) {
+
+      // Ignore click when cell is in use or already there is a winner
+      if (squares[i] || calculateWinner(squares)["winner"]) {
         return;
       }
+
+      // Update squeres history data
       squares[i] = this.state.xIsNext ? "X" : "O";
+      history_new = history.concat([{
+        squares: squares
+      }]);
+
+      // validate winner and update winner_line variable status
+      var winner_data = calculateWinner(squares);
+      if (winner_data["winner"]) {
+        winner_line = winner_data["winner_line"];
+        this.setState({
+          winner_line: winner_line
+        });
+      }
+
+      // Update state
       this.setState({
-        history: history.concat([{
-          squares: squares
-        }]),
+        history: history_new,
         stepNumber: history.length,
         xIsNext: !this.state.xIsNext
       });
@@ -146,7 +184,7 @@ var Game = function (_React$Component2) {
 
       var history = this.state.history;
       var current = history[this.state.stepNumber];
-      var winner = calculateWinner(current.squares);
+      var winner = calculateWinner(current.squares)["winner"];
 
       var moves = history.map(function (step, move) {
         var desc = void 0;
@@ -227,7 +265,7 @@ var Game = function (_React$Component2) {
           { className: "game-board" },
           React.createElement(Board, { squares: current.squares, onClick: function onClick(i) {
               return _this4.handleClick(i);
-            } })
+            }, winner_line: this.state.winner_line })
         ),
         React.createElement(
           "div",
