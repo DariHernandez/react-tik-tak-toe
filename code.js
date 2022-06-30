@@ -236,7 +236,15 @@ var Game = function (_React$Component2) {
       if (winner) {
         status = "Winner: " + winner;
       } else {
-        status = "Next player: " + (this.state.xIsNext ? "X" : "O");
+        // Validate if all cells aren't empty
+        var empty_cells = current.squares.filter(function (cell) {
+          return cell == null;
+        });
+        if (empty_cells.length == 0) {
+          status = "Draw"; // Draw message
+        } else {
+          status = "Next player: " + (this.state.xIsNext ? "X" : "O"); // Next player message
+        }
       }
 
       // Reverse button order

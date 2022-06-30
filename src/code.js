@@ -193,7 +193,14 @@ class Game extends React.Component {
     if (winner) {
       status = "Winner: " + winner
     } else {
-      status = "Next player: " + (this.state.xIsNext ? "X": "O")
+      // Validate if all cells aren't empty
+      const empty_cells = current.squares.filter ((cell) => cell == null)
+      if (empty_cells.length == 0) {
+        status = "Draw" // Draw message
+      } else {
+        status = "Next player: " + (this.state.xIsNext ? "X": "O") // Next player message
+      }
+
     }
 
     // Reverse button order
